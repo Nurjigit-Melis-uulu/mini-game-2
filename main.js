@@ -16,6 +16,11 @@ class Game {
       { x: 388, y: 240, w: 12, h: 12 },
     ];
     this.enemies = [];
+    this.enemies_moving_direction = "right";
+    this.user_moving_direction = null;
+    this.start = true;
+    this.enemies_speed = 2;
+    this.user_speed = 2;
   }
 
   // --------- initialization ---------
@@ -79,14 +84,60 @@ class Game {
   // --------- updating params ---------
 
   update() {
+    this.update_enemies();
+
     this.draw();
 
-    window.requestAnimationFrame(() => this.update());
+    this.start ? window.requestAnimationFrame(() => this.update()) : null;
+  }
+
+  update_enemies_moving_direction() {
+    this.enemies.forEach((enemy) => {
+      if (this.enemies[0].x < 1 && this.enemies_moving_direction === "left") {
+        this.enemies_moving_direction = "right";
+      }
+      if (
+        this.enemies[this.enemies.length - 1].x > this.width - 10 &&
+        this.enemies_moving_direction === "right"
+      ) {
+        this.enemies_moving_direction = "left";
+      }
+    });
+  }
+
+  update_enemies() {
+    this.update_enemies_moving_direction();
+
+    this.enemies.forEach((enemy) => {
+      if (this.enemies_moving_direction === "left") {
+        enemy.x -= this.enemies_speed;
+      } else {
+        enemy.x += this.enemies_speed;
+      }
+    });
+  }
+
+  update_user(key) {
+    if (key === "left") {
+      this.user.x -= this.user_speed;
+    } else {
+      this.user.x += this.user_speed;
+    }
+
+    this.user_moving_direction = key;
+  }
+
+  update_start(status) {
+    this.start = status;
+
+    this.update();
   }
 
   // --------- drawing canvas elements ---------
 
   draw() {
+    this.cleaning_ways();
+
     this.draw_barriers();
     this.draw_enemies();
     this.draw_user();
@@ -113,8 +164,64 @@ class Game {
 
     this.ctx.fillRect(this.user.x, this.user.y, this.user.w, this.user.h);
   }
+
+  // --------- cleaning canvas elements ---------
+
+  cleaning_ways() {
+    this.cleaning_enemies_ways();
+    this.cleaning_user_way();
+  }
+
+  cleaning_enemies_ways() {
+    let way = 10;
+
+    this.ctx.fillStyle = "#000";
+
+    if (this.enemies_moving_direction === "left") {
+      way = 10;
+    } else {
+      way = -10;
+    }
+
+    this.enemies.forEach((enemy) => {
+      this.ctx.fillRect(enemy.x + way, enemy.y, enemy.w, enemy.h);
+    });
+  }
+
+  cleaning_user_way() {
+    this.ctx.fillStyle = "#000";
+    let way = this.user_speed;
+
+    if (this.user_moving_direction !== null) {
+      if (this.user_moving_direction === "left") {
+        way = this.user_speed;
+      } else if (this.user_moving_direction === "right") {
+        way = -this.user_speed;
+      }
+      this.ctx.fillRect(
+        this.user.x + way,
+        this.user.y,
+        this.user.w,
+        this.user.h
+      );
+    }
+  }
 }
 
 let game = new Game();
 
 window.addEventListener("load", game.init());
+document.documentElement.addEventListener("keydown", (e) => {
+  // console.log(e.key, e.keyCode);
+
+  if (e.keyCode === 27) {
+    // if pressed "ESC"
+    game.update_start(!game.start);
+  }
+
+  if (e.keyCode === 37) {
+    game.update_user("left");
+  } else if (e.keyCode === 39) {
+    game.update_user("right");
+  }
+});
