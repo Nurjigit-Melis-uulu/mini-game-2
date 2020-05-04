@@ -95,6 +95,7 @@ class Game {
   // --------- updating params ---------
 
   update() {
+    this.update_checking_hits();
     this.update_enemies();
     this.update_user_bullets();
 
@@ -155,6 +156,24 @@ class Game {
     this.start = status;
 
     this.update();
+  }
+
+  update_checking_hits() {
+    this.user_bullets.forEach((bullet) => {
+      for (let i = 0; i < this.enemies.length; i++) {
+        const enemy = this.enemies[i];
+
+        if (
+          bullet.y >= enemy.y &&
+          bullet.y <= enemy.y + enemy.h &&
+          bullet.x >= enemy.x &&
+          bullet.x <= enemy.x + enemy.w
+        ) {
+          this.enemies.splice(i, 1);
+          this.cleaning_dead_enemy(enemy);
+        }
+      }
+    });
   }
 
   // --------- drawing canvas elements ---------
@@ -252,6 +271,11 @@ class Game {
         this.user.h
       );
     }
+  }
+
+  cleaning_dead_enemy(enemy) {
+    this.ctx.fillStyle = "#000";
+    this.ctx.fillRect(enemy.x, enemy.y, enemy.w, enemy.h);
   }
 }
 
