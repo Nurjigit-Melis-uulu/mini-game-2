@@ -21,6 +21,8 @@ class Game {
     this.start = true;
     this.enemies_speed = 2;
     this.user_speed = 2;
+    this.user_bullets = [];
+    this.user_bullets_speed = 4;
   }
 
   // --------- initialization ---------
@@ -81,10 +83,20 @@ class Game {
     console.log(this.enemies);
   }
 
+  set_user_bullets() {
+    this.user_bullets.push({
+      x: this.user.x + 5,
+      y: this.user.y - 4,
+      w: 1,
+      h: 4,
+    });
+  }
+
   // --------- updating params ---------
 
   update() {
     this.update_enemies();
+    this.update_user_bullets();
 
     this.draw();
 
@@ -117,6 +129,18 @@ class Game {
     });
   }
 
+  update_user_bullets() {
+    for (let i = 0; i < this.user_bullets.length; i++) {
+      const bullet = this.user_bullets[i];
+
+      if (bullet.y < -this.user_bullets_speed) {
+        this.user_bullets.splice(i, 1);
+      } else {
+        bullet.y -= this.user_bullets_speed;
+      }
+    }
+  }
+
   update_user(key) {
     if (key === "left") {
       this.user.x -= this.user_speed;
@@ -138,9 +162,18 @@ class Game {
   draw() {
     this.cleaning_ways();
 
+    this.draw_user_bullets();
     this.draw_barriers();
     this.draw_enemies();
     this.draw_user();
+  }
+
+  draw_user_bullets() {
+    this.ctx.fillStyle = "#fff00f";
+
+    this.user_bullets.forEach((bullet) => {
+      this.ctx.fillRect(bullet.x, bullet.y, bullet.w, bullet.h);
+    });
   }
 
   draw_barriers() {
@@ -168,6 +201,7 @@ class Game {
   // --------- cleaning canvas elements ---------
 
   cleaning_ways() {
+    this.cleaning_user_bullets_way();
     this.cleaning_enemies_ways();
     this.cleaning_user_way();
   }
@@ -185,6 +219,19 @@ class Game {
 
     this.enemies.forEach((enemy) => {
       this.ctx.fillRect(enemy.x + way, enemy.y, enemy.w, enemy.h);
+    });
+  }
+
+  cleaning_user_bullets_way() {
+    this.ctx.fillStyle = "#000";
+
+    this.user_bullets.forEach((bullet) => {
+      this.ctx.fillRect(
+        bullet.x,
+        bullet.y + this.user_bullets_speed,
+        bullet.w,
+        bullet.h
+      );
     });
   }
 
@@ -223,5 +270,9 @@ document.documentElement.addEventListener("keydown", (e) => {
     game.update_user("left");
   } else if (e.keyCode === 39) {
     game.update_user("right");
+  }
+
+  if (e.keyCode === 38) {
+    game.set_user_bullets();
   }
 });
