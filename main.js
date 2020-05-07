@@ -47,7 +47,7 @@ class Game {
       let r = Math.floor(Math.random() * this.enemies.length);
       this.enemies.length > 0
         ? this.set_enemy_bullets(this.enemies[r])
-        : this.game_over();
+        : this.game_over("win");
     }, 200);
   }
 
@@ -120,7 +120,7 @@ class Game {
   update() {
     this.draw();
 
-    this.enemies ? this.update_enemies() : this.game_over();
+    this.enemies ? this.update_enemies() : null;
     this.enemy_bullets ? this.update_enemy_bullets() : null;
     this.user_bullets ? this.update_user_bullets() : null;
     this.start ? window.requestAnimationFrame(() => this.update()) : null;
@@ -209,7 +209,7 @@ class Game {
         bullet.x >= this.user.x &&
         bullet.x <= this.user.x + this.user.w
       ) {
-        this.game_over();
+        this.game_over("lose");
       }
     });
   }
@@ -375,12 +375,13 @@ class Game {
 
   // --------- game over ---------
 
-  game_over() {
+  game_over(status) {
     clearInterval(this.timeInterval);
-    console.log("game over");
+    console.log("game over", status);
     this.start = false;
 
     document.querySelector(".window").style.display = "block";
+    document.querySelector(".info").innerText = "you are " + status;
   }
 
   // --------- restart game ---------
