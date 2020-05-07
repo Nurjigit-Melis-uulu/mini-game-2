@@ -45,7 +45,9 @@ class Game {
   set_interval() {
     this.timeInterval = setInterval(() => {
       let r = Math.floor(Math.random() * this.enemies.length);
-      this.set_enemy_bullets(this.enemies[r]);
+      this.enemies.length > 0
+        ? this.set_enemy_bullets(this.enemies[r])
+        : this.game_over();
     }, 200);
   }
 
@@ -116,10 +118,9 @@ class Game {
   // --------- updating params ---------
 
   update() {
-    this.update_enemies();
-
     this.draw();
 
+    this.enemies ? this.update_enemies() : this.game_over();
     this.enemy_bullets ? this.update_enemy_bullets() : null;
     this.user_bullets ? this.update_user_bullets() : null;
     this.start ? window.requestAnimationFrame(() => this.update()) : null;
@@ -208,9 +209,7 @@ class Game {
         bullet.x >= this.user.x &&
         bullet.x <= this.user.x + this.user.w
       ) {
-        console.log("game over");
-        this.start = false;
-        clearInterval(this.timeInterval);
+        this.game_over();
       }
     });
   }
@@ -371,7 +370,15 @@ class Game {
 
   cleaning_dead_enemy(enemy) {
     this.ctx.fillStyle = "#000";
-    this.ctx.fillRect(enemy.x, enemy.y, enemy.w, enemy.h);
+    this.ctx.fillRect(enemy.x - 4, enemy.y, enemy.w + 8, enemy.h);
+  }
+
+  // --------- game over ---------
+
+  game_over() {
+    clearInterval(this.timeInterval);
+    console.log("game over");
+    this.start = false;
   }
 }
 
