@@ -23,6 +23,9 @@ class Game {
     this.user_speed = 2;
     this.user_bullets = [];
     this.user_bullets_speed = 4;
+    this.enemy_bullets = [];
+    this.enemy_bullets_speed = 4;
+    this.timeInterval = null;
   }
 
   // --------- initialization ---------
@@ -33,8 +36,16 @@ class Game {
     // this.set_barriers();
     this.set_enemies();
     this.update();
+    this.set_interval();
 
     document.querySelector("body").appendChild(this.cnv);
+  }
+
+  set_interval() {
+    this.timeInterval = setInterval(() => {
+      let r = Math.floor(Math.random() * this.enemies.length);
+      this.set_enemy_bullets(this.enemies[r]);
+    }, 200);
   }
 
   set_cnv() {
@@ -92,15 +103,24 @@ class Game {
     });
   }
 
+  set_enemy_bullets(enemy) {
+    this.enemy_bullets.push({
+      x: enemy.x + enemy.w / 2,
+      y: enemy.y + enemy.h,
+      w: 1,
+      h: 4,
+    });
+  }
+
   // --------- updating params ---------
 
   update() {
-    this.update_checking_hits();
     this.update_enemies();
-    this.update_user_bullets();
 
     this.draw();
 
+    this.enemy_bullets ? this.update_enemy_bullets() : null;
+    this.user_bullets ? this.update_user_bullets() : null;
     this.start ? window.requestAnimationFrame(() => this.update()) : null;
   }
 
@@ -140,6 +160,22 @@ class Game {
         bullet.y -= this.user_bullets_speed;
       }
     }
+
+    this.update_checking_user_hits();
+  }
+
+  update_enemy_bullets() {
+    for (let i = 0; i < this.enemy_bullets.length; i++) {
+      const bullet = this.enemy_bullets[i];
+
+      if (bullet.y > this.height) {
+        this.enemy_bullets.splice(i, 1);
+      } else {
+        bullet.y += this.enemy_bullets_speed;
+      }
+    }
+
+    this.update_checking_enemy_hits();
   }
 
   update_user(key) {
@@ -158,7 +194,21 @@ class Game {
     this.update();
   }
 
-  update_checking_hits() {
+  update_checking_enemy_hits() {
+    this.enemy_bullets.forEach((bullet) => {
+      if (
+        bullet.y >= this.user.y &&
+        bullet.y <= this.user.y + this.user.h &&
+        bullet.x >= this.user.x &&
+        bullet.x <= this.user.x + this.user.w
+      ) {
+        alert("game over");
+        clearInterval(this.timeInterval);
+      }
+    });
+  }
+
+  update_checking_user_hits() {
     this.user_bullets.forEach((bullet) => {
       for (let i = 0; i < this.enemies.length; i++) {
         const enemy = this.enemies[i];
@@ -181,7 +231,8 @@ class Game {
   draw() {
     this.cleaning_ways();
 
-    this.draw_user_bullets();
+    this.user_bullets ? this.draw_user_bullets() : null;
+    this.enemy_bullets ? this.draw_enemy_bullets() : null;
     this.draw_barriers();
     this.draw_enemies();
     this.draw_user();
@@ -191,6 +242,14 @@ class Game {
     this.ctx.fillStyle = "#fff00f";
 
     this.user_bullets.forEach((bullet) => {
+      this.ctx.fillRect(bullet.x, bullet.y, bullet.w, bullet.h);
+    });
+  }
+
+  draw_enemy_bullets() {
+    this.ctx.fillStyle = "#fff00f";
+
+    this.enemy_bullets.forEach((bullet) => {
       this.ctx.fillRect(bullet.x, bullet.y, bullet.w, bullet.h);
     });
   }
@@ -220,7 +279,8 @@ class Game {
   // --------- cleaning canvas elements ---------
 
   cleaning_ways() {
-    this.cleaning_user_bullets_way();
+    this.user_bullets ? this.cleaning_user_bullets_way() : null;
+    this.enemy_bullets ? this.cleaning_enemy_bullets_way() : null;
     this.cleaning_enemies_ways();
     this.cleaning_user_way();
   }
@@ -248,6 +308,19 @@ class Game {
       this.ctx.fillRect(
         bullet.x,
         bullet.y + this.user_bullets_speed,
+        bullet.w,
+        bullet.h
+      );
+    });
+  }
+
+  cleaning_enemy_bullets_way() {
+    this.ctx.fillStyle = "#000";
+
+    this.enemy_bullets.forEach((bullet) => {
+      this.ctx.fillRect(
+        bullet.x,
+        bullet.y - this.enemy_bullets_speed,
         bullet.w,
         bullet.h
       );
