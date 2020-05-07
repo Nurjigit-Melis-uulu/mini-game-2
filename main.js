@@ -379,10 +379,42 @@ class Game {
     clearInterval(this.timeInterval);
     console.log("game over");
     this.start = false;
+
+    document.querySelector(".window").style.display = "block";
+  }
+
+  // --------- restart game ---------
+
+  restart() {
+    this.user = {
+      x: 295,
+      y: 280,
+      w: 10,
+      h: 10,
+      color: "blue",
+      bullet_color: "aqua",
+    };
+    this.enemies = [];
+    this.enemies_moving_direction = "right";
+    this.user_moving_direction = null;
+    this.start = true;
+    this.user_bullets = [];
+    this.enemy_bullets = [];
+    this.timeInterval = null;
+
+    document.querySelector(".window").style.display = "none";
+
+    this.ctx.fillStyle = "#000";
+    this.ctx.fillRect(0, 0, this.width, this.height);
+
+    this.set_enemies();
+    this.update();
+    this.set_interval();
   }
 }
 
 let game = new Game();
+let restart_btn = document.querySelector(".restart");
 
 window.addEventListener("load", game.init());
 document.documentElement.addEventListener("keydown", (e) => {
@@ -403,3 +435,5 @@ document.documentElement.addEventListener("keydown", (e) => {
     game.set_user_bullets();
   }
 });
+
+restart_btn.addEventListener("click", () => game.restart());
