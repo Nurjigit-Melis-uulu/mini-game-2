@@ -10,6 +10,7 @@ class Game {
       w: 10,
       h: 10,
       color: "blue",
+      bullet_color: "aqua",
     };
     this.barriers = [
       { x: 194, y: 240, w: 12, h: 12 },
@@ -154,28 +155,31 @@ class Game {
     for (let i = 0; i < this.user_bullets.length; i++) {
       const bullet = this.user_bullets[i];
 
-      if (bullet.y < -this.user_bullets_speed) {
+      if (
+        bullet.y < -this.user_bullets_speed ||
+        this.check_bullet_hit_to_barriers(bullet)
+      ) {
         this.user_bullets.splice(i, 1);
       } else {
         bullet.y -= this.user_bullets_speed;
       }
     }
 
-    this.update_checking_user_hits();
+    this.check_user_hits();
   }
 
   update_enemy_bullets() {
     for (let i = 0; i < this.enemy_bullets.length; i++) {
       const bullet = this.enemy_bullets[i];
 
-      if (bullet.y > this.height) {
+      if (bullet.y > this.height || this.check_bullet_hit_to_barriers(bullet)) {
         this.enemy_bullets.splice(i, 1);
       } else {
         bullet.y += this.enemy_bullets_speed;
       }
     }
 
-    this.update_checking_enemy_hits();
+    this.check_enemy_hits();
   }
 
   update_user(key) {
@@ -194,7 +198,9 @@ class Game {
     this.update();
   }
 
-  update_checking_enemy_hits() {
+  // --------- checking ---------
+
+  check_enemy_hits() {
     this.enemy_bullets.forEach((bullet) => {
       if (
         bullet.y >= this.user.y &&
@@ -202,13 +208,14 @@ class Game {
         bullet.x >= this.user.x &&
         bullet.x <= this.user.x + this.user.w
       ) {
-        alert("game over");
+        console.log("game over");
+        this.start = false;
         clearInterval(this.timeInterval);
       }
     });
   }
 
-  update_checking_user_hits() {
+  check_user_hits() {
     this.user_bullets.forEach((bullet) => {
       for (let i = 0; i < this.enemies.length; i++) {
         const enemy = this.enemies[i];
@@ -226,6 +233,22 @@ class Game {
     });
   }
 
+  check_bullet_hit_to_barriers(bullet) {
+    let result = false;
+    this.barriers.forEach((barrier) => {
+      if (
+        bullet.y >= barrier.y &&
+        bullet.y <= barrier.y + barrier.h &&
+        bullet.x >= barrier.x &&
+        bullet.x <= barrier.x + barrier.w
+      ) {
+        result = true;
+      }
+    });
+
+    return result;
+  }
+
   // --------- drawing canvas elements ---------
 
   draw() {
@@ -239,7 +262,7 @@ class Game {
   }
 
   draw_user_bullets() {
-    this.ctx.fillStyle = "#fff00f";
+    this.ctx.fillStyle = this.user.bullet_color;
 
     this.user_bullets.forEach((bullet) => {
       this.ctx.fillRect(bullet.x, bullet.y, bullet.w, bullet.h);
