@@ -21,7 +21,7 @@ class Game {
     this.user_moving_direction = null;
     this.start = true;
     this.enemies_speed = 2;
-    this.user_speed = 5.5;
+    this.user_speed = 5;
     this.user_bullets = [];
     this.user_bullets_speed = 4;
     this.enemy_bullets = [];
