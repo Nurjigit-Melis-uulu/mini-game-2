@@ -61,14 +61,6 @@ class Game {
     this.cnv.height = this.height;
   }
 
-  // set_barriers() {
-  //   this.barriers[0].x = this.width / 3;
-  //   this.barriers[0].y = 240;
-
-  //   this.barriers[1].x = (this.width / 3) * 2;
-  //   this.barriers[1].y = 240;
-  // }
-
   set_enemies() {
     let enemy = {};
     let interval = {
@@ -93,8 +85,6 @@ class Game {
       interval.x = 20;
       interval.y += 20;
     }
-
-    console.log(this.enemies);
   }
 
   set_user_bullets() {
@@ -113,6 +103,18 @@ class Game {
       w: 1,
       h: 4,
     });
+  }
+
+  resize() {
+    if (window.innerWidth < 600) {
+      this.width = window.innerHeight;
+      this.height = window.innerWidth;
+    } else {
+      this.width = 600;
+      this.height = 300;
+    }
+
+    this.set_size();
   }
 
   // --------- updating params ---------
@@ -417,7 +419,8 @@ class Game {
 let game = new Game();
 let restart_btn = document.querySelector(".restart");
 
-window.addEventListener("load", game.init());
+window.addEventListener("load", () => game.init());
+window.addEventListener("resize", () => game.resize());
 document.documentElement.addEventListener("keydown", (e) => {
   // console.log(e.key, e.keyCode);
 
