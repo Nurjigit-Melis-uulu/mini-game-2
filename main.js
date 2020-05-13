@@ -21,7 +21,7 @@ class Game {
     this.user_moving_direction = null;
     this.start = true;
     this.enemies_speed = 2;
-    this.user_speed = 2;
+    this.user_speed = 5.5;
     this.user_bullets = [];
     this.user_bullets_speed = 4;
     this.enemy_bullets = [];
@@ -411,9 +411,13 @@ class Game {
 
 let game = new Game();
 let restart_btn = document.querySelector(".restart");
+let fire_btn = document.querySelector("#fire");
+let left_btn = document.querySelector("#left");
+let right_btn = document.querySelector("#right");
 
 window.addEventListener("load", () => game.init());
 window.addEventListener("resize", () => game.set_size());
+
 document.documentElement.addEventListener("keydown", (e) => {
   // console.log(e.key, e.keyCode);
 
@@ -429,8 +433,11 @@ document.documentElement.addEventListener("keydown", (e) => {
   }
 
   if (e.keyCode === 38) {
-    game.set_user_bullets();
   }
 });
+
+fire_btn.addEventListener("mousedown", () => game.set_user_bullets());
+left_btn.addEventListener("mousedown", () => game.update_user("left"));
+right_btn.addEventListener("mousedown", () => game.update_user("right"));
 
 restart_btn.addEventListener("click", () => game.restart());
