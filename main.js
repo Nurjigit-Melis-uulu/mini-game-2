@@ -39,7 +39,7 @@ class Game {
     this.update();
     this.set_interval();
 
-    document.querySelector("body").appendChild(this.cnv);
+    document.querySelector("body").prepend(this.cnv);
   }
 
   set_interval() {

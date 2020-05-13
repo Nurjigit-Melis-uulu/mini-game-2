@@ -4,6 +4,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
   background-color: rgb(29, 29, 29);
 }
 
@@ -30,4 +31,12 @@ canvas {
   color: white;
   background-color: black;
   padding: 2px 5px;
+}
+
+@media (max-width: 600px) {
+
+  canvas,
+  .window {
+    transform: rotate(90deg);
+  }
 }
