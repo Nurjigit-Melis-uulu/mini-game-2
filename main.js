@@ -57,8 +57,13 @@ class Game {
   }
 
   set_size() {
-    this.cnv.width = this.width;
-    this.cnv.height = this.height;
+    if (window.innerWidth < 600) {
+      this.cnv.width = this.width = window.innerHeight;
+      this.cnv.height = this.height = window.innerWidth;
+    } else {
+      this.cnv.width = this.width = 600;
+      this.cnv.height = this.height = 300;
+    }
   }
 
   set_enemies() {
@@ -103,18 +108,6 @@ class Game {
       w: 1,
       h: 4,
     });
-  }
-
-  resize() {
-    if (window.innerWidth < 600) {
-      this.width = window.innerHeight;
-      this.height = window.innerWidth;
-    } else {
-      this.width = 600;
-      this.height = 300;
-    }
-
-    this.set_size();
   }
 
   // --------- updating params ---------
@@ -420,7 +413,7 @@ let game = new Game();
 let restart_btn = document.querySelector(".restart");
 
 window.addEventListener("load", () => game.init());
-window.addEventListener("resize", () => game.resize());
+window.addEventListener("resize", () => game.set_size());
 document.documentElement.addEventListener("keydown", (e) => {
   // console.log(e.key, e.keyCode);
 
