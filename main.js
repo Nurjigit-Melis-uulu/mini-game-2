@@ -4,6 +4,17 @@ class Game {
     this.ctx = null;
     this.height = 300;
     this.width = 600;
+    this.enemies = [];
+    this.enemies_moving_direction = "right";
+    this.user_moving_direction = null;
+    this.start = true;
+    this.enemies_speed = 2;
+    this.user_speed = 5;
+    this.user_bullets = [];
+    this.user_bullets_speed = 4;
+    this.enemy_bullets = [];
+    this.enemy_bullets_speed = 4;
+    this.timeInterval = null;
     this.user = {
       x: 295,
       y: 280,
@@ -16,17 +27,6 @@ class Game {
       { x: 194, y: 240, w: 12, h: 12 },
       { x: 388, y: 240, w: 12, h: 12 },
     ];
-    this.enemies = [];
-    this.enemies_moving_direction = "right";
-    this.user_moving_direction = null;
-    this.start = true;
-    this.enemies_speed = 2;
-    this.user_speed = 5;
-    this.user_bullets = [];
-    this.user_bullets_speed = 4;
-    this.enemy_bullets = [];
-    this.enemy_bullets_speed = 4;
-    this.timeInterval = null;
   }
 
   // --------- initialization ---------
@@ -433,6 +433,7 @@ document.documentElement.addEventListener("keydown", (e) => {
   }
 
   if (e.keyCode === 38) {
+    game.set_user_bullets();
   }
 });
 
